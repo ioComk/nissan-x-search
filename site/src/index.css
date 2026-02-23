@@ -68,6 +68,10 @@
 .prose-notion strong {
   @apply font-semibold text-foreground;
 }
+.prose-notion a {
+  color: hsl(var(--primary));
+  @apply underline underline-offset-2 decoration-primary/30 hover:decoration-primary/60 transition-colors;
+}
 .prose-notion pre {
   @apply mb-4 p-4 rounded-lg overflow-x-auto;
   background: hsl(var(--muted));
