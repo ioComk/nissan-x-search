@@ -8,7 +8,7 @@ interface CalendarGridProps {
   onDateSelect: (date: string) => void;
 }
 
-const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
+const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 export function CalendarGrid({
   year,
@@ -40,15 +40,18 @@ export function CalendarGrid({
   }
 
   return (
-    <div className="border-b">
+    <div className="border-b border-border">
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 border-b">
+      <div className="grid grid-cols-7 border-b border-border bg-muted/20">
         {WEEKDAYS.map((wd, i) => (
           <div
             key={wd}
             className={cn(
-              "px-3 py-2 text-xs font-medium text-muted-foreground text-center",
-              i < 6 && "border-r"
+              "px-2 py-2 text-[10px] font-medium tracking-widest text-center",
+              i < 6 && "border-r border-border",
+              i === 0 && "text-red-400/60",
+              i === 6 && "text-blue-400/60",
+              i > 0 && i < 6 && "text-muted-foreground"
             )}
           >
             {wd}
@@ -58,15 +61,16 @@ export function CalendarGrid({
 
       {/* Weeks */}
       {weeks.map((week, wi) => (
-        <div key={wi} className="grid grid-cols-7 border-b last:border-b-0">
+        <div key={wi} className="grid grid-cols-7 border-b border-border last:border-b-0">
           {week.map((day, di) => {
             if (day === null) {
               return (
                 <div
                   key={di}
                   className={cn(
-                    "h-16 sm:h-24 p-1.5 sm:p-2 bg-muted/30",
-                    di < 6 && "border-r"
+                    "h-16 sm:h-24 p-1.5 sm:p-2",
+                    di < 6 && "border-r border-border",
+                    "bg-background/20"
                   )}
                 />
               );
@@ -82,27 +86,43 @@ export function CalendarGrid({
                 key={di}
                 onClick={() => hasData && onDateSelect(dateStr)}
                 className={cn(
-                  "h-16 sm:h-24 p-1.5 sm:p-2 text-left transition-colors relative",
-                  di < 6 && "border-r",
-                  hasData && "cursor-pointer hover:bg-accent",
+                  "h-16 sm:h-24 p-1.5 sm:p-2 text-left transition-all relative group",
+                  di < 6 && "border-r border-border",
+                  hasData && "cursor-pointer hover:bg-primary/5",
                   !hasData && "cursor-default",
-                  isSelected && "bg-primary/5"
+                  isSelected && "bg-primary/10 shadow-inner",
+                  isSelected && "shadow-[inset_0_0_20px_hsl(193_100%_45%_/_0.06)]"
                 )}
               >
+                {/* Selected indicator line */}
+                {isSelected && (
+                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary/60" />
+                )}
+
                 <span
                   className={cn(
-                    "inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 text-xs sm:text-sm rounded-full",
+                    "inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 text-xs sm:text-sm font-mono rounded",
                     isToday &&
-                      "bg-primary text-primary-foreground font-semibold",
-                    !isToday && "text-foreground"
+                      "bg-primary text-primary-foreground font-bold glow-text",
+                    !isToday && hasData && "text-foreground group-hover:text-primary",
+                    !isToday && !hasData && "text-muted-foreground/40"
                   )}
                 >
                   {day}
                 </span>
+
                 {hasData && (
                   <div className="mt-0.5 sm:mt-1">
-                    <span className="inline-block px-1 sm:px-1.5 py-px sm:py-0.5 text-[9px] sm:text-[10px] font-medium rounded bg-primary/10 text-primary truncate">
-                      まとめ
+                    <span
+                      className={cn(
+                        "inline-flex items-center gap-0.5 px-1 sm:px-1.5 py-px text-[9px] sm:text-[10px] font-medium rounded tracking-widest uppercase",
+                        isSelected
+                          ? "bg-primary/20 text-primary"
+                          : "bg-primary/10 text-primary/70 group-hover:bg-primary/15 group-hover:text-primary"
+                      )}
+                    >
+                      <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-current" />
+                      DATA
                     </span>
                   </div>
                 )}

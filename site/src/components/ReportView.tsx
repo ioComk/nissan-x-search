@@ -1,7 +1,7 @@
 import type { DailyReport } from "@/lib/types";
 import { Markdown } from "./Markdown";
 import { Button } from "./ui/button";
-import { X } from "lucide-react";
+import { X, Calendar, Loader2 } from "lucide-react";
 
 interface ReportViewProps {
   date: string;
@@ -13,29 +13,61 @@ interface ReportViewProps {
 export function ReportView({ date, report, loading, onClose }: ReportViewProps) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-semibold">{date}</h2>
-          {report && (
-            <p className="text-sm text-muted-foreground mt-1">
-              {report.dateRange}
-            </p>
-          )}
+      {/* Panel header */}
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 w-7 h-7 rounded border border-primary/30 flex items-center justify-center bg-primary/5 flex-shrink-0">
+            <Calendar className="w-3.5 h-3.5 text-primary" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-bold font-mono tracking-widest text-foreground">
+                {date}
+              </h2>
+              <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                <span className="w-1 h-1 rounded-full bg-primary" />
+                REPORT
+              </span>
+            </div>
+            {report && (
+              <p className="text-xs text-muted-foreground mt-0.5 font-mono">
+                {report.dateRange}
+              </p>
+            )}
+          </div>
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose}>
-          <X className="h-4 w-4" />
+
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10 flex-shrink-0"
+        >
+          <X className="h-3.5 w-3.5" />
         </Button>
       </div>
 
+      {/* Divider */}
+      <div className="relative mb-6">
+        <div className="h-px bg-border" />
+        <div className="absolute left-0 top-0 h-px w-16 bg-primary/50" />
+      </div>
+
       {loading && (
-        <div className="text-center py-12 text-muted-foreground">
-          読み込み中...
+        <div className="flex flex-col items-center justify-center py-16 gap-3">
+          <Loader2 className="w-6 h-6 text-primary animate-spin" />
+          <span className="text-xs text-muted-foreground tracking-widest uppercase font-mono">
+            Loading data...
+          </span>
         </div>
       )}
 
       {!loading && !report && (
-        <div className="text-center py-12 text-muted-foreground">
-          データが見つかりませんでした
+        <div className="flex flex-col items-center justify-center py-16 gap-2">
+          <div className="text-2xl text-muted-foreground/20 font-mono">404</div>
+          <span className="text-xs text-muted-foreground tracking-widest uppercase font-mono">
+            No data found
+          </span>
         </div>
       )}
 
