@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 24 10% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 24 10% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 24 10% 10%;
+    --primary: 347 100% 38%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 6% 96%;
+    --secondary-foreground: 24 10% 10%;
+    --muted: 40 6% 96%;
+    --muted-foreground: 25 5% 45%;
+    --accent: 40 6% 96%;
+    --accent-foreground: 24 10% 10%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 40 6% 90%;
+    --input: 40 6% 90%;
+    --ring: 347 100% 38%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
+  }
+}
+
+/* Notion-like markdown prose */
+.prose-notion h1 {
+  @apply text-2xl font-bold mt-8 mb-4;
+}
+.prose-notion h2 {
+  @apply text-lg font-semibold mt-6 mb-3;
+}
+.prose-notion h3 {
+  @apply text-base font-medium mt-4 mb-2 text-muted-foreground;
+}
+.prose-notion p {
+  @apply mb-3 leading-relaxed;
+  color: hsl(25 5% 35%);
+}
+.prose-notion ul {
+  @apply mb-4 pl-6 space-y-1.5;
+  list-style-type: disc;
+}
+.prose-notion li {
+  color: hsl(25 5% 35%);
+}
+.prose-notion li::marker {
+  color: hsl(var(--primary));
+}
+.prose-notion hr {
+  @apply my-6;
+  border-color: hsl(var(--border));
+}
+.prose-notion strong {
+  @apply font-semibold text-foreground;
+}
+.prose-notion pre {
+  @apply mb-4 p-4 rounded-lg overflow-x-auto;
+  background: hsl(var(--muted));
+}
+.prose-notion code {
+  @apply text-sm;
+}

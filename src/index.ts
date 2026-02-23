@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { searchX, summarizeResults } from "./xSearch.js";
-import { writeDailyPage, updateIndexPage } from "./pageGenerator.js";
+import { writeDailyData, updateIndex } from "./pageGenerator.js";
 
 async function main() {
   const apiKey = process.env.XAI_API_KEY;
@@ -44,11 +44,11 @@ async function main() {
   const dateRange = `${formatDate(fromDate)} ～ ${todayStr}`;
   const summary = await summarizeResults(apiKey, results, dateRange);
 
-  // HTML ページを生成
-  writeDailyPage(summary, dateRange, todayStr);
-  updateIndexPage();
+  // JSON データを生成
+  writeDailyData(summary, dateRange, todayStr);
+  updateIndex();
 
-  console.log("\n完了: GitHub Pages 用のページを生成しました。");
+  console.log("\n完了: GitHub Pages 用のデータを生成しました。");
 }
 
 main().catch((err) => {

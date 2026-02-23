@@ -22,18 +22,26 @@ jobs:
           node-version: "22"
           cache: "npm"
 
-      - name: Install dependencies
+      - name: Install dependencies (search)
         run: npm ci
 
-      - name: Build
+      - name: Build search script
         run: npm run build
 
-      - name: Generate daily page
+      - name: Generate daily data
         env:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
           SEARCH_KEYWORDS: ${{ vars.SEARCH_KEYWORDS || '日産,Nissan' }}
           SEARCH_DAYS: ${{ vars.SEARCH_DAYS || '1' }}
         run: npm start
+
+      - name: Install dependencies (site)
+        working-directory: site
+        run: npm ci
+
+      - name: Build site
+        working-directory: site
+        run: npm run build
 
       - name: Commit and push
         run: |
