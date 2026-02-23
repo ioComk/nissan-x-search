@@ -1,7 +1,7 @@
 {
   "name": "nissan-x-search",
   "version": "1.0.0",
-  "description": "NissanについてXで検索し、Discord webhookに投稿するツール",
+  "description": "NissanについてXで検索し、GitHub Pagesに日次レポートを公開するツール",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",

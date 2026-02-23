@@ -6,8 +6,11 @@ on:
     - cron: "0 22 * * *"
   workflow_dispatch: # 手動実行も可能
 
+permissions:
+  contents: write
+
 jobs:
-  search-and-post:
+  search-and-publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,16 +22,36 @@ jobs:
           node-version: "22"
           cache: "npm"
 
-      - name: Install dependencies
+      - name: Install dependencies (search)
         run: npm ci
 
-      - name: Build
+      - name: Build search script
         run: npm run build
 
-      - name: Run search and post to Discord
+      - name: Generate daily data
         env:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           SEARCH_KEYWORDS: ${{ vars.SEARCH_KEYWORDS || '日産,Nissan' }}
           SEARCH_DAYS: ${{ vars.SEARCH_DAYS || '1' }}
         run: npm start
+
+      - name: Install dependencies (site)
+        working-directory: site
+        run: npm ci
+
+      - name: Build site
+        working-directory: site
+        run: npm run build
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            DATE=$(date -u +"%Y-%m-%d")
+            git commit -m "docs: ${DATE} の日産 X まとめを追加"
+            git push
+          fi
