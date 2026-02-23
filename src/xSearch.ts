@@ -4,7 +4,7 @@
  */
 
 const XAI_API_URL = "https://api.x.ai/v1/responses";
-const MODEL = "grok-3-fast-latest";
+const MODEL = "grok-4-1-fast";
 
 export interface XSearchOptions {
   keywords: string[];
