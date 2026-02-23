@@ -1,17 +1,11 @@
 import "dotenv/config";
 import { searchX, summarizeResults } from "./xSearch.js";
-import { buildSummaryEmbeds, sendToDiscord } from "./discord.js";
+import { writeDailyPage, updateIndexPage } from "./pageGenerator.js";
 
 async function main() {
   const apiKey = process.env.XAI_API_KEY;
   if (!apiKey) {
     console.error("エラー: XAI_API_KEY が設定されていません");
-    process.exit(1);
-  }
-
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-  if (!webhookUrl) {
-    console.error("エラー: DISCORD_WEBHOOK_URL が設定されていません");
     process.exit(1);
   }
 
@@ -27,17 +21,18 @@ async function main() {
   fromDate.setDate(fromDate.getDate() - searchDays);
 
   const formatDate = (d: Date) => d.toISOString().split("T")[0];
+  const todayStr = formatDate(toDate);
 
   console.log("=== Nissan X Search ===");
   console.log(`キーワード: ${keywords.join(", ")}`);
-  console.log(`期間: ${formatDate(fromDate)} ～ ${formatDate(toDate)}`);
+  console.log(`期間: ${formatDate(fromDate)} ～ ${todayStr}`);
   console.log("");
 
   // X を検索
   const results = await searchX(apiKey, {
     keywords,
     fromDate: formatDate(fromDate),
-    toDate: formatDate(toDate),
+    toDate: todayStr,
   });
 
   if (results.length === 0) {
@@ -46,14 +41,14 @@ async function main() {
   }
 
   // 全結果を統合して1つのMarkdown要約を生成
-  const dateRange = `${formatDate(fromDate)} ～ ${formatDate(toDate)}`;
+  const dateRange = `${formatDate(fromDate)} ～ ${todayStr}`;
   const summary = await summarizeResults(apiKey, results, dateRange);
 
-  // Discord embed を構築して送信
-  const embeds = buildSummaryEmbeds(summary, dateRange);
-  await sendToDiscord(webhookUrl, embeds);
+  // HTML ページを生成
+  writeDailyPage(summary, dateRange, todayStr);
+  updateIndexPage();
 
-  console.log("\n完了: 統合要約を Discord に送信しました。");
+  console.log("\n完了: GitHub Pages 用のページを生成しました。");
 }
 
 main().catch((err) => {

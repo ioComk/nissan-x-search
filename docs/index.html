@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日産 X まとめ</title>
+  <style>
+    :root {
+      --nissan-red: #c3002f;
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --text: #e4e4e7;
+      --text-muted: #9ca3af;
+      --border: #2d3040;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    header {
+      background: linear-gradient(135deg, var(--nissan-red), #8b0020);
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    header h1 { font-size: 1.8rem; font-weight: 700; }
+    header p { color: rgba(255,255,255,0.8); margin-top: 0.5rem; }
+    main {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+    }
+    .card h2 {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    .empty { color: var(--text-muted); text-align: center; padding: 2rem; }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>日産関連 X ポストまとめ</h1>
+    <p>毎日の X (Twitter) ポストをセンチメント分析してお届け</p>
+  </header>
+  <main>
+    <div class="card">
+      <h2>レポート一覧</h2>
+      <p class="empty">まだレポートがありません</p>
+    </div>
+  </main>
+  <footer>Powered by Grok (xAI) | Nissan X Search</footer>
+</body>
+</html>
