@@ -64,12 +64,11 @@ export async function sendToDiscord(
 }
 
 /**
- * 検索結果テキストを Discord embed に変換する
+ * 統合Markdown要約を Discord embed に変換する
  * ヘッダー embed + 本文 embed(s) の構成
  */
-export function buildEmbeds(
-  keyword: string,
-  content: string,
+export function buildSummaryEmbeds(
+  summary: string,
   dateRange: string
 ): DiscordEmbed[] {
   const now = new Date().toISOString();
@@ -78,21 +77,21 @@ export function buildEmbeds(
   // ヘッダー embed
   embeds.push({
     author: { name: "Nissan X Search" },
-    title: `🔍 「${keyword}」の最新ポストまとめ`,
+    title: "📋 日産関連 X ポストまとめ",
     description: `📅 ${dateRange}`,
     color: 0xc3002f, // Nissan レッド
     timestamp: now,
   });
 
   // 本文 embed(s)
-  if (content.length <= MAX_EMBED_DESCRIPTION) {
+  if (summary.length <= MAX_EMBED_DESCRIPTION) {
     embeds.push({
-      description: content,
+      description: summary,
       color: 0x1da1f2,
       footer: { text: "Powered by Grok (xAI) | X Search" },
     });
   } else {
-    const parts = splitText(content, MAX_EMBED_DESCRIPTION);
+    const parts = splitText(summary, MAX_EMBED_DESCRIPTION);
     for (let i = 0; i < parts.length; i++) {
       embeds.push({
         description: parts[i],

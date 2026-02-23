@@ -97,6 +97,66 @@ export async function searchX(
   return results;
 }
 
+/**
+ * 複数キーワードの検索結果を統合し、1つのMarkdown要約を生成する
+ */
+export async function summarizeResults(
+  apiKey: string,
+  results: XSearchResult[],
+  dateRange: string
+): Promise<string> {
+  const combinedContent = results
+    .map((r) => `### キーワード: ${r.query}\n${r.content}`)
+    .join("\n\n");
+
+  const query = `以下は複数のキーワードでXを検索した結果です。これらを統合して、1つのMarkdown形式の要約レポートにまとめてください。
+
+## ルール:
+- キーワードごとに分けず、トピックやテーマごとにセクションを分けて1つのレポートにまとめる
+- 重複するポストは1つにまとめる
+- 各ポストの要約は1〜2文に簡潔にまとめる
+- 日本語で出力する
+- ユーザー名（@xxx）は含める
+- エンゲージメント（❤️🔁）の情報があれば含める
+- ポストURLがあれば含める
+- Markdown形式で見やすく整形する
+- 冒頭に全体の概要を2〜3文で書く
+
+## 検索期間: ${dateRange}
+
+## 検索結果:
+${combinedContent}`;
+
+  console.log("[xSearch] 全体の統合要約を生成中...");
+
+  const response = await fetch(XAI_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      input: [{ role: "user", content: query }],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`xAI API エラー (${response.status}): ${errorText}`);
+  }
+
+  const data = await response.json();
+  const content = extractContent(data);
+
+  if (!content) {
+    throw new Error("統合要約の生成に失敗しました");
+  }
+
+  console.log("[xSearch] 統合要約を生成しました");
+  return content;
+}
+
 function extractContent(responseData: Record<string, unknown>): string | null {
   const output = responseData.output;
   if (!Array.isArray(output)) return null;

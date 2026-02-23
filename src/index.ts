@@ -1,6 +1,6 @@
 import "dotenv/config";
-import { searchX } from "./xSearch.js";
-import { buildEmbeds, sendToDiscord } from "./discord.js";
+import { searchX, summarizeResults } from "./xSearch.js";
+import { buildSummaryEmbeds, sendToDiscord } from "./discord.js";
 
 async function main() {
   const apiKey = process.env.XAI_API_KEY;
@@ -45,16 +45,15 @@ async function main() {
     return;
   }
 
-  // Discord embed を構築
+  // 全結果を統合して1つのMarkdown要約を生成
   const dateRange = `${formatDate(fromDate)} ～ ${formatDate(toDate)}`;
-  const allEmbeds = results.flatMap((r) =>
-    buildEmbeds(r.query, r.content, dateRange)
-  );
+  const summary = await summarizeResults(apiKey, results, dateRange);
 
-  // Discord に送信
-  await sendToDiscord(webhookUrl, allEmbeds);
+  // Discord embed を構築して送信
+  const embeds = buildSummaryEmbeds(summary, dateRange);
+  await sendToDiscord(webhookUrl, embeds);
 
-  console.log(`\n完了: ${results.length} 件のキーワードの結果を Discord に送信しました。`);
+  console.log("\n完了: 統合要約を Discord に送信しました。");
 }
 
 main().catch((err) => {
