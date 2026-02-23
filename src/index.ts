@@ -46,7 +46,10 @@ async function main() {
   }
 
   // Discord embed を構築
-  const allEmbeds = results.flatMap((r) => buildEmbeds(r.query, r.content));
+  const dateRange = `${formatDate(fromDate)} ～ ${formatDate(toDate)}`;
+  const allEmbeds = results.flatMap((r) =>
+    buildEmbeds(r.query, r.content, dateRange)
+  );
 
   // Discord に送信
   await sendToDiscord(webhookUrl, allEmbeds);

@@ -3,14 +3,15 @@
  */
 
 const MAX_EMBED_DESCRIPTION = 4096;
-const MAX_CONTENT_LENGTH = 2000;
 
 export interface DiscordEmbed {
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   color?: number;
   timestamp?: string;
   footer?: { text: string };
+  fields?: { name: string; value: string; inline?: boolean }[];
+  author?: { name: string; icon_url?: string };
 }
 
 interface DiscordWebhookPayload {
@@ -64,34 +65,46 @@ export async function sendToDiscord(
 
 /**
  * 検索結果テキストを Discord embed に変換する
+ * ヘッダー embed + 本文 embed(s) の構成
  */
 export function buildEmbeds(
   keyword: string,
-  content: string
+  content: string,
+  dateRange: string
 ): DiscordEmbed[] {
   const now = new Date().toISOString();
+  const embeds: DiscordEmbed[] = [];
 
-  // description が 4096 文字を超える場合は分割
+  // ヘッダー embed
+  embeds.push({
+    author: { name: "Nissan X Search" },
+    title: `🔍 「${keyword}」の最新ポストまとめ`,
+    description: `📅 ${dateRange}`,
+    color: 0xc3002f, // Nissan レッド
+    timestamp: now,
+  });
+
+  // 本文 embed(s)
   if (content.length <= MAX_EMBED_DESCRIPTION) {
-    return [
-      {
-        title: `🔍 X検索: "${keyword}"`,
-        description: content,
-        color: 0x1da1f2, // X (Twitter) ブルー
-        timestamp: now,
-        footer: { text: "Powered by Grok (xAI)" },
-      },
-    ];
+    embeds.push({
+      description: content,
+      color: 0x1da1f2,
+      footer: { text: "Powered by Grok (xAI) | X Search" },
+    });
+  } else {
+    const parts = splitText(content, MAX_EMBED_DESCRIPTION);
+    for (let i = 0; i < parts.length; i++) {
+      embeds.push({
+        description: parts[i],
+        color: 0x1da1f2,
+        ...(i === parts.length - 1 && {
+          footer: { text: "Powered by Grok (xAI) | X Search" },
+        }),
+      });
+    }
   }
 
-  const parts = splitText(content, MAX_EMBED_DESCRIPTION);
-  return parts.map((part, i) => ({
-    title: `🔍 X検索: "${keyword}" (${i + 1}/${parts.length})`,
-    description: part,
-    color: 0x1da1f2,
-    timestamp: now,
-    footer: { text: "Powered by Grok (xAI)" },
-  }));
+  return embeds;
 }
 
 function splitText(text: string, maxLength: number): string[] {
@@ -104,14 +117,18 @@ function splitText(text: string, maxLength: number): string[] {
       break;
     }
 
-    // 改行で区切れる箇所を探す
-    let splitIndex = remaining.lastIndexOf("\n", maxLength);
-    if (splitIndex === -1 || splitIndex < maxLength * 0.5) {
+    // "---" の区切り線で分割を試みる
+    let splitIndex = remaining.lastIndexOf("\n---", maxLength);
+    if (splitIndex === -1 || splitIndex < maxLength * 0.3) {
+      // 改行で区切る
+      splitIndex = remaining.lastIndexOf("\n", maxLength);
+    }
+    if (splitIndex === -1 || splitIndex < maxLength * 0.3) {
       splitIndex = maxLength;
     }
 
     parts.push(remaining.slice(0, splitIndex));
-    remaining = remaining.slice(splitIndex).trimStart();
+    remaining = remaining.slice(splitIndex).replace(/^\n?---\n?/, "\n").trimStart();
   }
 
   return parts;
