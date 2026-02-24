@@ -69,9 +69,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen hud-grid flex flex-col">
-      {/* Scan line overlay */}
-      <div className="scanline" />
-
       {/* Header */}
       <header className="relative z-10 border-b border-border bg-card/60 backdrop-blur-sm px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between">
