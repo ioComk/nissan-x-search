@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- 背景 -->
+  <rect width="32" height="32" rx="5" fill="#0B1120"/>
+
+  <!-- 外枠リング（日産バッジ風楕円） -->
+  <ellipse cx="16" cy="16" rx="14" ry="9" fill="none" stroke="#00C8E0" stroke-width="1.5"/>
+
+  <!-- 横棒（日産バッジ風） -->
+  <line x1="2" y1="16" x2="30" y2="16" stroke="#00C8E0" stroke-width="1.5"/>
+
+  <!-- 「N」の文字（中央） -->
+  <text
+    x="16"
+    y="20.5"
+    font-family="'Arial', sans-serif"
+    font-weight="900"
+    font-size="13"
+    fill="#00C8E0"
+    text-anchor="middle"
+    letter-spacing="-0.5"
+  >N</text>
+
+  <!-- 右下の「X」マーク -->
+  <circle cx="26" cy="24" r="5" fill="#0B1120" stroke="#00C8E0" stroke-width="1"/>
+  <line x1="23.5" y1="21.5" x2="28.5" y2="26.5" stroke="#00C8E0" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="28.5" y1="21.5" x2="23.5" y2="26.5" stroke="#00C8E0" stroke-width="1.5" stroke-linecap="round"/>
+</svg>
