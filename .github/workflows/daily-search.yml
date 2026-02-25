@@ -31,10 +31,24 @@ jobs:
       - name: Install dependencies (search)
         run: npm ci
 
+      - name: Check if today's report exists
+        id: check-report
+        run: |
+          DATE=$(date -u +"%Y-%m-%d")
+          if [ -f "docs/data/${DATE}.json" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "今日のレポートが既に存在します: docs/data/${DATE}.json — 検索をスキップします"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "今日のレポートが存在しません: docs/data/${DATE}.json — 検索を実行します"
+          fi
+
       - name: Build search script
+        if: steps.check-report.outputs.exists != 'true'
         run: npm run build
 
       - name: Generate daily data
+        if: steps.check-report.outputs.exists != 'true'
         env:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
           SEARCH_KEYWORDS: ${{ vars.SEARCH_KEYWORDS || '日産,Nissan' }}
@@ -42,6 +56,7 @@ jobs:
         run: npm start
 
       - name: Commit data files
+        if: steps.check-report.outputs.exists != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
