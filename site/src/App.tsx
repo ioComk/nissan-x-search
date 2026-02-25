@@ -1,13 +1,20 @@
 import { useState, useEffect, useCallback } from "react";
 import { fetchIndex, fetchReport } from "./lib/data";
-import { getBookmarks, toggleBookmark } from "./lib/bookmarks";
+import {
+  getTopicBookmarks,
+  getBookmarkedDates,
+  toggleTopicBookmark,
+  type TopicBookmark,
+} from "./lib/bookmarks";
 import type { DailyReport } from "./lib/types";
 import { CalendarGrid } from "./components/CalendarGrid";
 import { ReportView } from "./components/ReportView";
+import { BookmarksPage } from "./components/BookmarksPage";
 import { ChevronLeft, ChevronRight, Rss, Github, Bookmark } from "lucide-react";
 import { Button } from "./components/ui/button";
 
 export default function App() {
+  const [view, setView] = useState<"calendar" | "bookmarks">("calendar");
   const [availableDates, setAvailableDates] = useState<Set<string>>(new Set());
   const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date();
@@ -16,21 +23,16 @@ export default function App() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [report, setReport] = useState<DailyReport | null>(null);
   const [loading, setLoading] = useState(false);
-  const [bookmarkedDates, setBookmarkedDates] = useState<Set<string>>(() => getBookmarks());
-  const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
+  const [topicBookmarks, setTopicBookmarks] = useState<TopicBookmark[]>(() =>
+    getTopicBookmarks()
+  );
+
+  const bookmarkedDates = getBookmarkedDates();
+  const bookmarkedTopicIds = new Set(topicBookmarks.map((b) => b.id));
 
   useEffect(() => {
     fetchIndex().then((data) => setAvailableDates(new Set(data.dates)));
   }, []);
-
-  const handleToggleBookmark = useCallback(() => {
-    if (!selectedDate) return;
-    setBookmarkedDates(toggleBookmark(selectedDate));
-  }, [selectedDate]);
-
-  const displayDates = showBookmarksOnly
-    ? new Set([...availableDates].filter((d) => bookmarkedDates.has(d)))
-    : availableDates;
 
   const handleDateSelect = useCallback(
     async (date: string) => {
@@ -47,6 +49,23 @@ export default function App() {
     },
     [selectedDate]
   );
+
+  const handleToggleTopic = useCallback((bookmark: TopicBookmark) => {
+    setTopicBookmarks(toggleTopicBookmark(bookmark));
+  }, []);
+
+  const handleRemoveBookmark = useCallback((id: string) => {
+    setTopicBookmarks(
+      toggleTopicBookmark({
+        id,
+        date: "",
+        section: "",
+        raw: "",
+        html: "",
+        bookmarkedAt: 0,
+      })
+    );
+  }, []);
 
   const goToPrevMonth = () => {
     setCurrentMonth((prev) => {
@@ -79,6 +98,17 @@ export default function App() {
     month: "long",
   });
 
+  // ブックマークページ
+  if (view === "bookmarks") {
+    return (
+      <BookmarksPage
+        bookmarks={topicBookmarks}
+        onRemove={handleRemoveBookmark}
+        onBack={() => setView("calendar")}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen hud-grid flex flex-col">
       {/* Header */}
@@ -102,14 +132,27 @@ export default function App() {
           </div>
 
           {/* Right status indicators */}
-          <div className="hidden sm:flex items-center gap-4 text-[10px] text-muted-foreground tracking-wider uppercase">
-            <div className="flex items-center gap-1.5">
-              <span className="status-dot" />
-              <span>LIVE</span>
-            </div>
-            <div className="flex items-center gap-1.5 opacity-50">
-              <span>Powered by</span>
-              <span className="text-primary font-mono">Grok / xAI</span>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <button
+              onClick={() => setView("bookmarks")}
+              className="flex items-center gap-1.5 text-[10px] text-muted-foreground tracking-wider uppercase hover:text-amber-400 transition-colors"
+            >
+              <Bookmark className="w-3.5 h-3.5" />
+              {topicBookmarks.length > 0 && (
+                <span className="text-amber-400 font-mono">
+                  {topicBookmarks.length}
+                </span>
+              )}
+            </button>
+            <div className="hidden sm:flex items-center gap-4 text-[10px] text-muted-foreground tracking-wider uppercase">
+              <div className="flex items-center gap-1.5">
+                <span className="status-dot" />
+                <span>LIVE</span>
+              </div>
+              <div className="flex items-center gap-1.5 opacity-50">
+                <span>Powered by</span>
+                <span className="text-primary font-mono">Grok / xAI</span>
+              </div>
             </div>
           </div>
         </div>
@@ -162,27 +205,9 @@ export default function App() {
           </Button>
         </div>
 
-        <div className="ml-auto flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowBookmarksOnly((prev) => !prev)}
-            className={
-              showBookmarksOnly
-                ? "h-7 px-2 gap-1.5 text-[11px] tracking-widest uppercase text-amber-400 bg-amber-400/10 hover:bg-amber-400/15"
-                : "h-7 px-2 gap-1.5 text-[11px] tracking-widest uppercase text-muted-foreground hover:text-amber-400 hover:bg-amber-400/10"
-            }
-          >
-            <Bookmark className="h-3 w-3" />
-            <span className="hidden sm:inline">BOOKMARKS</span>
-            {bookmarkedDates.size > 0 && (
-              <span className="text-[9px] opacity-70">({bookmarkedDates.size})</span>
-            )}
-          </Button>
-          <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-muted-foreground font-mono">
-            <span>{showBookmarksOnly ? displayDates.size : availableDates.size}</span>
-            <span className="opacity-50">reports indexed</span>
-          </div>
+        <div className="ml-auto hidden sm:flex items-center gap-1.5 text-[10px] text-muted-foreground font-mono">
+          <span>{availableDates.size}</span>
+          <span className="opacity-50">reports indexed</span>
         </div>
       </div>
 
@@ -191,7 +216,7 @@ export default function App() {
         <CalendarGrid
           year={currentMonth.year}
           month={currentMonth.month}
-          availableDates={displayDates}
+          availableDates={availableDates}
           selectedDate={selectedDate}
           onDateSelect={handleDateSelect}
           bookmarkedDates={bookmarkedDates}
@@ -209,8 +234,8 @@ export default function App() {
               setSelectedDate(null);
               setReport(null);
             }}
-            isBookmarked={bookmarkedDates.has(selectedDate)}
-            onToggleBookmark={handleToggleBookmark}
+            bookmarkedTopicIds={bookmarkedTopicIds}
+            onToggleTopic={handleToggleTopic}
           />
         </div>
       )}
