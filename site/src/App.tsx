@@ -149,10 +149,16 @@ export default function App() {
                 <span className="status-dot" />
                 <span>LIVE</span>
               </div>
-              <div className="flex items-center gap-1.5 opacity-50">
+              <a
+                href="https://console.x.ai/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 opacity-50 hover:opacity-100 hover:text-primary transition-opacity"
+                title="xAI Console（残高確認・クレジット購入）"
+              >
                 <span>Powered by</span>
                 <span className="text-primary font-mono">Grok / xAI</span>
-              </div>
+              </a>
             </div>
           </div>
         </div>
@@ -244,7 +250,15 @@ export default function App() {
       <footer className="relative z-10 border-t border-border bg-card/40 backdrop-blur-sm px-4 sm:px-6 py-3">
         <div className="flex items-center justify-between text-[10px] text-muted-foreground tracking-wider uppercase">
           <span className="font-mono opacity-50">NISSAN X-SEARCH v2.0</span>
-          <span className="opacity-40">SDV Intelligence Platform</span>
+          <a
+            href="https://console.x.ai/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="opacity-40 hover:opacity-80 hover:text-primary transition-opacity tracking-wider"
+            title="xAI Console（残高確認・クレジット購入）"
+          >
+            xAI Console
+          </a>
           <div className="flex items-center gap-3">
             <span className="font-mono opacity-50">© {new Date().getFullYear()}</span>
             <a
