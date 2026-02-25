@@ -3,7 +3,7 @@ import { fetchIndex, fetchReport } from "./lib/data";
 import type { DailyReport } from "./lib/types";
 import { CalendarGrid } from "./components/CalendarGrid";
 import { ReportView } from "./components/ReportView";
-import { ChevronLeft, ChevronRight, Rss } from "lucide-react";
+import { ChevronLeft, ChevronRight, Rss, Github } from "lucide-react";
 import { Button } from "./components/ui/button";
 
 export default function App() {
@@ -187,7 +187,18 @@ export default function App() {
         <div className="flex items-center justify-between text-[10px] text-muted-foreground tracking-wider uppercase">
           <span className="font-mono opacity-50">NISSAN X-SEARCH v2.0</span>
           <span className="opacity-40">SDV Intelligence Platform</span>
-          <span className="font-mono opacity-50">© {new Date().getFullYear()}</span>
+          <div className="flex items-center gap-3">
+            <span className="font-mono opacity-50">© {new Date().getFullYear()}</span>
+            <a
+              href="https://github.com/ioComk/nissan-x-search"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="opacity-50 hover:opacity-100 hover:text-primary transition-opacity"
+              aria-label="GitHub repository"
+            >
+              <Github className="w-3.5 h-3.5" />
+            </a>
+          </div>
         </div>
       </footer>
     </div>
