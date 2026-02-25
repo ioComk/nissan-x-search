@@ -1,6 +1,7 @@
 import type { TopicBookmark } from "@/lib/bookmarks";
 import { sectionColor } from "@/lib/markdown";
 import { Button } from "./ui/button";
+import { SyncPanel } from "./SyncPanel";
 import { ArrowLeft, Bookmark, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -8,9 +9,10 @@ interface BookmarksPageProps {
   bookmarks: TopicBookmark[];
   onRemove: (id: string) => void;
   onBack: () => void;
+  onSyncImport: (bookmarks: TopicBookmark[]) => void;
 }
 
-export function BookmarksPage({ bookmarks, onRemove, onBack }: BookmarksPageProps) {
+export function BookmarksPage({ bookmarks, onRemove, onBack, onSyncImport }: BookmarksPageProps) {
   // 日付ごとにグループ化（新しい順）
   const grouped = bookmarks.reduce<Record<string, TopicBookmark[]>>((acc, b) => {
     (acc[b.date] ??= []).push(b);
@@ -51,6 +53,9 @@ export function BookmarksPage({ bookmarks, onRemove, onBack }: BookmarksPageProp
           <div className="h-px flex-1 bg-gradient-to-l from-amber-400/30 via-amber-400/10 to-transparent" />
         </div>
       </header>
+
+      {/* Sync Panel */}
+      <SyncPanel onSyncImport={onSyncImport} />
 
       {/* Content */}
       <div className="relative z-10 flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 py-8">

@@ -6,6 +6,7 @@ import {
   toggleTopicBookmark,
   type TopicBookmark,
 } from "./lib/bookmarks";
+import { uploadBookmarks, downloadBookmarks } from "./lib/sync";
 import type { DailyReport } from "./lib/types";
 import { CalendarGrid } from "./components/CalendarGrid";
 import { ReportView } from "./components/ReportView";
@@ -34,6 +35,19 @@ export default function App() {
     fetchIndex().then((data) => setAvailableDates(new Set(data.dates)));
   }, []);
 
+  // 初回ロード時にクラウドからブックマークを取得（Supabase 設定済み時のみ）
+  useEffect(() => {
+    downloadBookmarks().then((downloaded) => {
+      if (downloaded !== null) {
+        setTopicBookmarks(downloaded);
+        localStorage.setItem(
+          "nissan-x-search:topic-bookmarks",
+          JSON.stringify(downloaded)
+        );
+      }
+    });
+  }, []);
+
   const handleDateSelect = useCallback(
     async (date: string) => {
       if (selectedDate === date) {
@@ -51,19 +65,29 @@ export default function App() {
   );
 
   const handleToggleTopic = useCallback((bookmark: TopicBookmark) => {
-    setTopicBookmarks(toggleTopicBookmark(bookmark));
+    const updated = toggleTopicBookmark(bookmark);
+    setTopicBookmarks(updated);
+    uploadBookmarks(updated);
   }, []);
 
   const handleRemoveBookmark = useCallback((id: string) => {
-    setTopicBookmarks(
-      toggleTopicBookmark({
-        id,
-        date: "",
-        section: "",
-        raw: "",
-        html: "",
-        bookmarkedAt: 0,
-      })
+    const updated = toggleTopicBookmark({
+      id,
+      date: "",
+      section: "",
+      raw: "",
+      html: "",
+      bookmarkedAt: 0,
+    });
+    setTopicBookmarks(updated);
+    uploadBookmarks(updated);
+  }, []);
+
+  const handleSyncImport = useCallback((imported: TopicBookmark[]) => {
+    setTopicBookmarks(imported);
+    localStorage.setItem(
+      "nissan-x-search:topic-bookmarks",
+      JSON.stringify(imported)
     );
   }, []);
 
@@ -105,6 +129,7 @@ export default function App() {
         bookmarks={topicBookmarks}
         onRemove={handleRemoveBookmark}
         onBack={() => setView("calendar")}
+        onSyncImport={handleSyncImport}
       />
     );
   }
