@@ -1,16 +1,18 @@
 import type { DailyReport } from "@/lib/types";
 import { Markdown } from "./Markdown";
 import { Button } from "./ui/button";
-import { X, Calendar, Loader2 } from "lucide-react";
+import { X, Calendar, Loader2, Bookmark, BookmarkCheck } from "lucide-react";
 
 interface ReportViewProps {
   date: string;
   report: DailyReport | null;
   loading: boolean;
   onClose: () => void;
+  isBookmarked: boolean;
+  onToggleBookmark: () => void;
 }
 
-export function ReportView({ date, report, loading, onClose }: ReportViewProps) {
+export function ReportView({ date, report, loading, onClose, isBookmarked, onToggleBookmark }: ReportViewProps) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
       {/* Panel header */}
@@ -37,14 +39,32 @@ export function ReportView({ date, report, loading, onClose }: ReportViewProps) 
           </div>
         </div>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10 flex-shrink-0"
-        >
-          <X className="h-3.5 w-3.5" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggleBookmark}
+            className={
+              isBookmarked
+                ? "h-7 w-7 text-amber-400 hover:text-amber-300 hover:bg-amber-400/10 flex-shrink-0"
+                : "h-7 w-7 text-muted-foreground hover:text-amber-400 hover:bg-amber-400/10 flex-shrink-0"
+            }
+            title={isBookmarked ? "ブックマーク解除" : "ブックマーク"}
+          >
+            {isBookmarked
+              ? <BookmarkCheck className="h-3.5 w-3.5" />
+              : <Bookmark className="h-3.5 w-3.5" />
+            }
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10 flex-shrink-0"
+          >
+            <X className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </div>
 
       {/* Divider */}

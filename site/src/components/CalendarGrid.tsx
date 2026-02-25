@@ -1,3 +1,4 @@
+import { Bookmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CalendarGridProps {
@@ -6,6 +7,7 @@ interface CalendarGridProps {
   availableDates: Set<string>;
   selectedDate: string | null;
   onDateSelect: (date: string) => void;
+  bookmarkedDates: Set<string>;
 }
 
 const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -16,6 +18,7 @@ export function CalendarGrid({
   availableDates,
   selectedDate,
   onDateSelect,
+  bookmarkedDates,
 }: CalendarGridProps) {
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
@@ -80,6 +83,7 @@ export function CalendarGrid({
             const hasData = availableDates.has(dateStr);
             const isSelected = dateStr === selectedDate;
             const isToday = dateStr === todayStr;
+            const isBookmarked = bookmarkedDates.has(dateStr);
 
             return (
               <button
@@ -97,6 +101,13 @@ export function CalendarGrid({
                 {/* Selected indicator line */}
                 {isSelected && (
                   <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary/60" />
+                )}
+
+                {/* Bookmark indicator */}
+                {isBookmarked && (
+                  <div className="absolute top-1 right-1">
+                    <Bookmark className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                  </div>
                 )}
 
                 <span

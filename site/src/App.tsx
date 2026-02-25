@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { fetchIndex, fetchReport } from "./lib/data";
+import { getBookmarks, toggleBookmark } from "./lib/bookmarks";
 import type { DailyReport } from "./lib/types";
 import { CalendarGrid } from "./components/CalendarGrid";
 import { ReportView } from "./components/ReportView";
-import { ChevronLeft, ChevronRight, Rss, Github } from "lucide-react";
+import { ChevronLeft, ChevronRight, Rss, Github, Bookmark } from "lucide-react";
 import { Button } from "./components/ui/button";
 
 export default function App() {
@@ -15,10 +16,21 @@ export default function App() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [report, setReport] = useState<DailyReport | null>(null);
   const [loading, setLoading] = useState(false);
+  const [bookmarkedDates, setBookmarkedDates] = useState<Set<string>>(() => getBookmarks());
+  const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
 
   useEffect(() => {
     fetchIndex().then((data) => setAvailableDates(new Set(data.dates)));
   }, []);
+
+  const handleToggleBookmark = useCallback(() => {
+    if (!selectedDate) return;
+    setBookmarkedDates(toggleBookmark(selectedDate));
+  }, [selectedDate]);
+
+  const displayDates = showBookmarksOnly
+    ? new Set([...availableDates].filter((d) => bookmarkedDates.has(d)))
+    : availableDates;
 
   const handleDateSelect = useCallback(
     async (date: string) => {
@@ -150,9 +162,27 @@ export default function App() {
           </Button>
         </div>
 
-        <div className="ml-auto hidden sm:flex items-center gap-1.5 text-[10px] text-muted-foreground font-mono">
-          <span>{availableDates.size}</span>
-          <span className="opacity-50">reports indexed</span>
+        <div className="ml-auto flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowBookmarksOnly((prev) => !prev)}
+            className={
+              showBookmarksOnly
+                ? "h-7 px-2 gap-1.5 text-[11px] tracking-widest uppercase text-amber-400 bg-amber-400/10 hover:bg-amber-400/15"
+                : "h-7 px-2 gap-1.5 text-[11px] tracking-widest uppercase text-muted-foreground hover:text-amber-400 hover:bg-amber-400/10"
+            }
+          >
+            <Bookmark className="h-3 w-3" />
+            <span className="hidden sm:inline">BOOKMARKS</span>
+            {bookmarkedDates.size > 0 && (
+              <span className="text-[9px] opacity-70">({bookmarkedDates.size})</span>
+            )}
+          </Button>
+          <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-muted-foreground font-mono">
+            <span>{showBookmarksOnly ? displayDates.size : availableDates.size}</span>
+            <span className="opacity-50">reports indexed</span>
+          </div>
         </div>
       </div>
 
@@ -161,9 +191,10 @@ export default function App() {
         <CalendarGrid
           year={currentMonth.year}
           month={currentMonth.month}
-          availableDates={availableDates}
+          availableDates={displayDates}
           selectedDate={selectedDate}
           onDateSelect={handleDateSelect}
+          bookmarkedDates={bookmarkedDates}
         />
       </div>
 
@@ -178,6 +209,8 @@ export default function App() {
               setSelectedDate(null);
               setReport(null);
             }}
+            isBookmarked={bookmarkedDates.has(selectedDate)}
+            onToggleBookmark={handleToggleBookmark}
           />
         </div>
       )}
