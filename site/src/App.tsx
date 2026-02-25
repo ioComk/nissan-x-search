@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { fetchIndex, fetchReport, fetchBalance } from "./lib/data";
-import type { XaiBalance } from "./lib/types";
+import { fetchIndex, fetchReport } from "./lib/data";
 import {
   getTopicBookmarks,
   getBookmarkedDates,
@@ -27,14 +26,12 @@ export default function App() {
   const [topicBookmarks, setTopicBookmarks] = useState<TopicBookmark[]>(() =>
     getTopicBookmarks()
   );
-  const [balance, setBalance] = useState<XaiBalance | null>(null);
 
   const bookmarkedDates = getBookmarkedDates();
   const bookmarkedTopicIds = new Set(topicBookmarks.map((b) => b.id));
 
   useEffect(() => {
     fetchIndex().then((data) => setAvailableDates(new Set(data.dates)));
-    fetchBalance().then(setBalance);
   }, []);
 
   const handleDateSelect = useCallback(
@@ -161,11 +158,6 @@ export default function App() {
               >
                 <span>Powered by</span>
                 <span className="text-primary font-mono">Grok / xAI</span>
-                {balance?.balance !== undefined && (
-                  <span className="font-mono text-amber-400/80">
-                    ${(balance.balance / 100).toFixed(2)}
-                  </span>
-                )}
               </a>
             </div>
           </div>
