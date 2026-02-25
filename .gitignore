@@ -2,3 +2,7 @@ node_modules/
 dist/
 .env
 *.js.map
+
+# Vite ビルド成果物（docs/data/ のみ git 管理、ビルド成果物は GitHub Actions でデプロイ）
+docs/assets/
+docs/index.html
