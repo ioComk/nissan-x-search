@@ -41,6 +41,27 @@ jobs:
           SEARCH_DAYS: ${{ vars.SEARCH_DAYS || '1' }}
         run: npm start
 
+      - name: Fetch xAI API balance
+        env:
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          XAI_TEAM_ID: ${{ vars.XAI_TEAM_ID }}
+        run: |
+          if [ -z "$XAI_TEAM_ID" ]; then
+            echo "XAI_TEAM_ID が未設定のためスキップ"
+            exit 0
+          fi
+          RESPONSE=$(curl -sf \
+            -H "Authorization: Bearer $XAI_API_KEY" \
+            "https://api.x.ai/v1/billing/teams/$XAI_TEAM_ID/prepaid/balance")
+          if [ $? -eq 0 ]; then
+            echo "$RESPONSE" \
+              | jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '. + {fetched_at: $ts}' \
+              > docs/data/balance.json
+            echo "残高を取得しました: $RESPONSE"
+          else
+            echo "残高の取得に失敗しました（team_id や API キーを確認してください）"
+          fi
+
       - name: Commit data files
         run: |
           git config user.name "github-actions[bot]"
