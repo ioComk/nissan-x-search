@@ -20,7 +20,8 @@ async function main() {
   const fromDate = new Date();
   fromDate.setDate(fromDate.getDate() - searchDays);
 
-  const formatDate = (d: Date) => d.toISOString().split("T")[0];
+  const formatDate = (d: Date) =>
+    d.toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
   const todayStr = formatDate(toDate);
 
   console.log("=== Nissan X Search ===");
