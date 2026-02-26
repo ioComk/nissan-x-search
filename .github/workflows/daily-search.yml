@@ -34,7 +34,7 @@ jobs:
       - name: Check if today's report exists
         id: check-report
         run: |
-          DATE=$(date -u +"%Y-%m-%d")
+          DATE=$(TZ=Asia/Tokyo date +"%Y-%m-%d")
           if [ -f "docs/data/${DATE}.json" ]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
             echo "今日のレポートが既に存在します: docs/data/${DATE}.json — 検索をスキップします"
@@ -64,7 +64,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            DATE=$(date -u +"%Y-%m-%d")
+            DATE=$(TZ=Asia/Tokyo date +"%Y-%m-%d")
             git commit -m "docs: ${DATE} の日産 X まとめを追加"
             git push
           fi
