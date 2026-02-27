@@ -18,13 +18,13 @@ function processLinks(text: string): string {
   const matches = [...text.matchAll(pattern)];
   if (matches.length === 0) return text;
   let idx = 0;
-  return text.replace(pattern, (_, _label, url) => {
+  return text.replace(pattern, (_, label, url) => {
     idx++;
     const num =
       matches.length > 1
         ? `<sup style="font-size:0.65em;margin-right:1px;opacity:0.75">${idx}</sup>`
         : "";
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${num}${LINK_ICON}</a>`;
+    return `${label}<a href="${url}" target="_blank" rel="noopener noreferrer">${num}${LINK_ICON}</a>`;
   });
 }
 
