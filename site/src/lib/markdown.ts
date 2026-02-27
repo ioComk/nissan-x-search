@@ -13,7 +13,24 @@ export interface ParsedSection {
 const LINK_ICON =
   '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-left:3px;vertical-align:middle;opacity:0.7"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>';
 
+/**
+ * "テキスト。[テキスト](URL)" のようにリンク前に重複するプレーンテキストがある場合、
+ * リンク部分のみを残す（AIが誤ったフォーマットで出力した場合の防御的処理）
+ */
+function removeRedundantPrefix(text: string): string {
+  // リンクが1つだけで、かつリンク前にプレーンテキストがある場合に適用
+  const match = text.match(/^([^\[]+)\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/);
+  if (match) {
+    const [, prefix, label, url] = match;
+    if (prefix.trim()) {
+      return `[${label}](${url})`;
+    }
+  }
+  return text;
+}
+
 function processLinks(text: string): string {
+  text = removeRedundantPrefix(text);
   const pattern = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
   const matches = [...text.matchAll(pattern)];
   if (matches.length === 0) return text;
